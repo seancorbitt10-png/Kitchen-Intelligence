@@ -42,6 +42,8 @@ async function startServer() {
     const ready = Boolean(process.env.DATABASE_URL && process.env.BUILT_IN_FORGE_API_URL && process.env.BUILT_IN_FORGE_API_KEY);
     res.status(ready ? 200 : 503).json({ ready, billingConfigured: false });
   });
+  app.use("/api/oauth", apiRateLimit);
+  app.use("/manus-storage", apiRateLimit);
   registerStorageProxy(app);
   registerOAuthRoutes(app);
   // tRPC API

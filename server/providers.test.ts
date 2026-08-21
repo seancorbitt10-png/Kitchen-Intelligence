@@ -20,4 +20,9 @@ describe("AI provider usage metadata", () => {
     expect(result.outputTokens).toBe(250);
     expect(result.estimatedCost).toBe("1.00000000");
   });
+
+  it("rejects malformed structured output before it can be persisted", async () => {
+    invokeLLM.mockResolvedValue({ model: "test-model", usage: { prompt_tokens: 1, completion_tokens: 1 }, choices: [{ message: { content: "not-json" } }] });
+    await expect(aiProvider.generateStructured({ operation: "malformed", messages: [], schema: { type: "object" } })).rejects.toThrow(SyntaxError);
+  });
 });

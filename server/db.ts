@@ -58,5 +58,24 @@ export async function exportUserData(userId: number) {
     db.select().from(pantryScans).where(eq(pantryScans.userId, userId)),
     db.select().from(subscriptions).where(eq(subscriptions.userId, userId)),
   ]);
-  return { profile, pantry, meals: mealsRows, shopping, interactions, usage, analytics, scans, subscriptions: subscriptionsRows, exportedAt: new Date().toISOString() };
+  const safeSubscriptions = subscriptionsRows.map(({ id, userId: _userId, plan, status, currentPeriodEnd, createdAt, updatedAt }) => ({ id, plan, status, currentPeriodEnd, createdAt, updatedAt }));
+  return { profile, pantry, meals: mealsRows, shopping, interactions, usage, analytics, scans, subscriptions: safeSubscriptions, exportedAt: new Date().toISOString() };
+}
+
+export async function deleteUserAccount(userId: number) {
+  const db = await getDb();
+  if (!db) return false;
+  await db.transaction(async tx => {
+    await tx.delete(analyticsEvents).where(eq(analyticsEvents.userId, userId));
+    await tx.delete(usageEvents).where(eq(usageEvents.userId, userId));
+    await tx.delete(mealInteractions).where(eq(mealInteractions.userId, userId));
+    await tx.delete(meals).where(eq(meals.userId, userId));
+    await tx.delete(shoppingItems).where(eq(shoppingItems.userId, userId));
+    await tx.delete(pantryScans).where(eq(pantryScans.userId, userId));
+    await tx.delete(pantryItems).where(eq(pantryItems.userId, userId));
+    await tx.delete(subscriptions).where(eq(subscriptions.userId, userId));
+    await tx.delete(userProfiles).where(eq(userProfiles.userId, userId));
+    await tx.delete(users).where(eq(users.id, userId));
+  });
+  return true;
 }

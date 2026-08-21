@@ -98,8 +98,18 @@
 - [x] Classify every missing dependency by availability, account, payment, business approval, or replaceability without activating anything
 - [x] Complete codebase-side production hardening for error handling, security, abuse protection, data isolation, image handling, deletion, export, AI cost tracking, analytics boundaries, monitoring hooks, and reasonable performance; document configuration, deployment, and backup/restore as launch-owner verification
 - [x] Document the stranger end-to-end V1 path and the target-environment verification gate
-- [x] Produce the final V1 Launch Blocker Report with sections A Complete, B Needs My Account/Credential Configuration, C Requires Money—Do Not Purchase, and D Billing—Intentionally Excluded
+- [x] Produce the final V1 Launch Blocker Report with the requested seven sections: completed today, verified, remaining owner configuration, requires purchase, billing, remaining blockers, and final status
 - [x] Add further route/component lazy loading or deeper chunking to reduce the remaining 636 kB frontend app chunk warning
-- [x] Add automated coverage for self-service data export and image-upload validation (22 tests passing)
+- [x] Add automated coverage for self-service data export and image-upload validation (23 tests passing)
 - [x] Explicitly document backup/restore as launch-owner verification rather than implemented application functionality
 - [x] Keep real production smoke tests, edge/WAF validation, and provider/account checks pending until target environment access exists
+
+# Final V1 completion pass — inherited audit
+
+- [x] Re-audit the current checkpoint against the complete final V1 production checklist and classify each area as complete, needs fix, needs configuration, blocked externally, or not required for V1
+- [x] Document and target-environment-gate the stranger journey from landing page through sign-up, onboarding, scan, AI meal generation, modification, planning, shopping, cooking reconciliation, privacy controls, logout/login, and persistence
+- [x] Verify codebase failure-state boundaries for authentication, image validation, malformed AI output, rate limits, invalid quantities, provider failures, and unavailable retailer functionality; document target-environment verification
+- [x] Verify every collected onboarding preference is persisted and used by recommendations or weekly planning
+- [x] Verify user isolation across pantry, scans, meals, history, preferences, shopping, analytics, AI usage, and account data at router/database boundaries
+- [x] Verify codebase deployment configuration, environment boundaries, health/readiness, and documented migration/backup/restore/domain/email/monitoring/edge-WAF readiness without activating external services
+- [x] Reconcile the final completion percentage and launch blockers in the V1 Launch Blocker Report after this audit

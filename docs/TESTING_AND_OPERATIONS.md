@@ -2,11 +2,11 @@
 
 ## Automated coverage
 
-The repository currently runs Vitest tests for authentication logout behavior and deterministic kitchen-domain utilities. The domain tests cover canonical ingredient normalization, malformed JSON fallback, and pantry alias matching. TypeScript checks pass with `pnpm check`.
+The current codebase passes the TypeScript check, the Vitest suite, and the production build. The suite covers authentication logout behavior, deterministic kitchen-domain utilities, AI usage metadata, malformed structured-output rejection, image-upload validation, router authorization and user isolation, pantry mutations, scan input boundaries, shopping consolidation and serving scaling, entitlement limits, cook/undo behavior, privacy deletion boundaries, and self-service export isolation. The current baseline is **23 tests across 6 files**. This is focused contract coverage rather than a claim that a sandbox run replaces production verification.
 
-## Required next test layers
+## Production verification still required
 
-Before commercial launch, add integration tests against an isolated database for profile persistence, user isolation, pantry CRUD, duplicate consolidation, scan confirmation, meal generation validation, allergy filtering, shopping consolidation, entitlement limits, account deletion, and admin authorization. Add provider-contract tests for AI and retailer adapters using recorded, non-production fixtures that cannot appear as customer data.
+Before public launch, the owner must run the fresh-account end-to-end journey with real kitchen images, verify production AI/vision quotas and rate limits, perform a safe database backup/restore drill, configure edge/WAF controls, verify monitoring and email choices, confirm domain and OAuth callback settings, and approve the legal/privacy language. No purchase or paid integration is required to complete the codebase-side work described here.
 
 ## AI safety contract
 
@@ -14,7 +14,7 @@ AI output is requested as structured JSON and is validated before rendering or p
 
 ## Analytics and usage
 
-The current implementation logs generated meals and meal interactions, and records AI operation rows. Expand analytics to signup, onboarding completion, first pantry addition, first scan, first generation, save, cook, pricing view, checkout start, subscription lifecycle, shopping list creation, product click, retention, and provider failures. Use the existing usage table as the source for cost accounting.
+The application records user-scoped events for onboarding completion, pantry additions, pantry scan confirmation, meal generation, modification, weekly planning, shopping-list creation, cooking, undo-cook, and meal interactions. AI usage rows capture operation, provider, model, input/output tokens where available, estimated cost, success, and timestamp. Acquisition-page analytics, signup attribution, and payment events remain environment/product-analytics work; checkout and subscription lifecycle events are intentionally excluded.
 
 ## Environment variables
 
@@ -22,4 +22,4 @@ The platform-injected variables currently include `DATABASE_URL`, `JWT_SECRET`, 
 
 ## Provider status
 
-`AIProvider` and `VisionProvider` interfaces are implemented in `server/providers.ts`. Billing checkout is an explicit blocked boundary until a billing provider is configured. Retailer and product discovery remain an explicit future provider boundary. No simulated checkout, fabricated product, or fake customer data is used.
+`AIProvider` and `VisionProvider` are implemented in `server/providers.ts`. Billing checkout is an explicit fail-closed boundary until a billing provider is separately selected and implemented. Retailer/product discovery remains disabled and truthful; the UI does not fabricate products, prices, availability, or retailer links. No simulated checkout, fabricated customer data, or fake production credentials are used.
