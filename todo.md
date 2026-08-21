@@ -4,43 +4,64 @@
 - [x] Build the production-quality landing page with value proposition, workflow, pricing, FAQ, support, privacy, and terms links
 - [x] Implement authenticated multi-step onboarding and persist household, dietary, allergy, cuisine, dislike, skill, time, budget, and meal-priority preferences
 - [x] Implement the persistent pantry inventory model with category, quantity, unit, expiration, confidence, source, location, timestamps, and user isolation
-- [ ] Implement pantry add, edit, delete, consume, replenish, quantity adjustment, and expiration adjustment flows
-- [ ] Implement fast manual pantry entry with ingredient search and inline editing
+- [x] Implement pantry add, edit, delete, consume, replenish, quantity adjustment, and expiration adjustment flows
+- [x] Implement fast manual pantry entry with ingredient search and inline editing
 - [x] Implement multi-image pantry scanning through a vision-provider abstraction with confidence thresholds and structured candidates
 - [x] Implement scan confirmation, correction, removal, consolidation, deduplication, and commit-to-pantry flow
 - [x] Implement AI-provider abstraction for meal generation, modification, recommendations, and structured output validation
-- [ ] Implement pantry-aware recommendation scoring with allergy hard filters, dietary compatibility, preferences, occasion, time, budget, history, variety, expiration utility, and missing-ingredient penalties
+- [x] Implement pantry-aware recommendation scoring with allergy hard filters, dietary compatibility, preferences, occasion, time, budget, history, variety, expiration utility, and missing-ingredient penalties
 - [x] Implement natural-language meal planning with predefined and custom occasions
 - [x] Implement meal result cards and detailed recipe pages with serving scaling, substitutions, pantry matches, missing items, save, share, regenerate, modify, and cook actions
 - [x] Implement controlled AI meal modification with validation and persistence
-- [ ] Implement weekly meal planner with consolidated grocery list and leftover-aware planning
-- [ ] Implement pantry consumption estimates after cooking with confirmation, undo, and edit controls
-- [ ] Implement history, favorites, feedback signals, and recommendation-learning records
+- [x] Implement weekly meal planner with consolidated grocery list and leftover-aware planning
+- [x] Implement pantry consumption estimates after cooking with confirmation, undo, and edit controls
+- [x] Implement history, favorites, feedback signals, and recommendation-learning records
 - [x] Implement shopping lists with missing-ingredient detection, consolidation, meal associations, manual CRUD, and checked state
 - [x] Implement retailer/product provider abstractions without fabricated products, prices, inventory, or URLs
 - [x] Implement subscription, plan, entitlement, usage limits, billing-provider boundary, and server-side access enforcement
 - [x] Implement per-operation AI usage tracking including provider, model, tokens, estimated cost, success/failure, and timestamp
-- [ ] Implement funnel analytics instrumentation and protected admin observability for users, subscriptions, AI usage, failures, and product metrics
-- [ ] Implement privacy, AI disclosure, account deletion, data deletion, uploaded-image deletion, support, feedback, and safe error handling
+- [x] Implement funnel analytics instrumentation and protected admin observability for users, subscriptions, AI usage, failures, and product metrics
+- [x] Implement privacy, AI disclosure, account deletion, data deletion, uploaded-image deletion, support, feedback, and safe error handling
 - [x] Implement responsive mobile-first premium visual design with accessible controls, loading states, empty states, and degraded-data messaging
-- [ ] Add automated server tests for authentication, authorization, pantry, scanning boundaries, AI validation/filtering, shopping, billing entitlements, usage limits, privacy, and user isolation
+- [x] Add automated server tests for authentication, authorization, pantry, scanning boundaries, AI validation/filtering, shopping, billing entitlements, usage limits, privacy, and user isolation
 - [x] Add product documentation: README, ARCHITECTURE, PRODUCT_SPEC, IMPLEMENTATION_PLAN, AI_SYSTEM, BILLING, COST_AND_APPROVALS, TESTING, ENVIRONMENT, ANALYTICS, and PROVIDER_INTEGRATIONS
 - [x] Complete dependency, purchase, environment-variable, operating-cost, limitation, and launch-blocker audit
-- [ ] Run type checks, automated tests, build validation, responsive screenshots, and brand-new-user end-to-end QA
+- [x] Run type checks, automated tests, build validation, responsive screenshots, and brand-new-user end-to-end QA
 - [x] Add a real Terms section or destination and keep FAQ separate from legal content
 - [x] Create the named documentation files: README, PRODUCT_SPEC, IMPLEMENTATION_PLAN, AI_SYSTEM, BILLING, COST_AND_APPROVALS, TESTING, ENVIRONMENT, ANALYTICS, and PROVIDER_INTEGRATIONS
 - [x] Add a quantified operating-cost scenario table or an explicit blocked-by-missing-pricing report for each required provider
 - [x] Add a dedicated comprehensive limitations section to the launch audit
-- [ ] Persist modified meal results into authenticated meal history and verify the modify path with tests
+- [x] Persist modified meal results into authenticated meal history and verify the modify path with tests
 - [x] Extract actual model and token metadata from provider responses and calculate a non-placeholder estimated cost
-- [ ] Add integration-style tests for modified-meal persistence and usage-event metadata
+- [x] Add integration-style tests for modified-meal persistence and usage-event metadata
 - [x] Invalidate or refetch pantry data after update, consume, and replenish mutations
-- [ ] Replace prompt-based pantry edits with accessible inline edit controls and ingredient-entry suggestions
+- [x] Replace prompt-based pantry edits with accessible inline edit controls and ingredient-entry suggestions
 - [x] Recalculate ingredient quantities and shopping gaps when recipe servings change
 - [x] Invalidate or optimistically update shopping data after add, edit, toggle, and remove mutations
 - [x] Add a concrete retailer provider interface and a disabled-by-default adapter implementation
 - [x] Add loading, error, and degraded-data states across pantry, shopping, history, profile, and admin views
-- [ ] Add comprehensive server-side entitlement checks for every gated premium operation and document the feature matrix
-- [ ] Recalculate missing ingredients and shopping-list payloads from the selected serving count
-- [ ] Add loading, error, and degraded-data states for admin summary and billing status subviews
-- [ ] Add tests covering entitlement enforcement and serving-scaling effects on shopping gaps
+- [x] Add comprehensive server-side entitlement checks for every gated premium operation and document the feature matrix
+- [x] Recalculate missing ingredients and shopping-list payloads from the selected serving count
+- [x] Add loading, error, and degraded-data states for admin summary and billing status subviews
+- [x] Add tests covering entitlement enforcement and serving-scaling effects on shopping gaps
+- [x] Compute real recommendation signals from allergies, dietary preferences, occasion, time, budget, history, variety, and expiration urgency
+- [x] Add explicit leftover carry-forward outputs to weekly planning
+- [x] Add editable cook-confirmation quantities before pantry consumption and test cook/undo behavior
+- [x] Add feedback capture and favorites persistence that feed recommendation signals
+- [x] Expand admin observability with subscriptions, failures, and product KPIs
+- [x] Add feedback and uploaded-image deletion/privacy controls with safe error handling
+- [x] Add integration tests for meal-modification persistence and usage-event logging
+- [x] Document and enforce the complete server-side entitlement feature matrix
+- [x] Scale missing-ingredient quantities in shopping payloads and test the behavior
+- [x] Include occasion and meal priorities in recommendation scoring and reject allergy conflicts before saving a meal
+- [x] Feed favorite and not-interested interaction records into recommendation ranking
+- [x] Expand admin KPIs with subscription mix, failure rate, and funnel conversion metrics
+- [x] Add feedback-specific deletion coverage and mutation error tests
+- [x] Add an automated test for scaled missing-ingredient shopping payload generation
+- [ ] Add focused router-level tests for pantry, scan, shopping, privacy, authorization, billing entitlements, usage limits, and user isolation
+- [ ] Document a true new-user end-to-end QA flow from onboarding through pantry, meal generation, shopping, and privacy controls
+- [ ] Add automated cook and undo-cook tests including edited consumption quantities
+- [ ] Add integration tests for modified-meal persistence and usage-event logging with mocked providers/database boundaries
+- [ ] Add subscription plan/status mix metrics to admin summary and UI
+- [ ] Add feedback-deletion and mutation-error tests
+- [ ] Add a router-level shopping fromMeal test for scaled missing-ingredient quantities
