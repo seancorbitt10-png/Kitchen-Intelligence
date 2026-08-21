@@ -43,3 +43,20 @@ export async function logAnalytics(userId: number | null, eventName: string, met
 export async function getSubscription(userId: number) { const db = await getDb(); if (!db) return { plan: "free", status: "active" }; const rows = await db.select().from(subscriptions).where(eq(subscriptions.userId, userId)).limit(1); return rows[0] ?? { plan: "free", status: "active" }; }
 export async function usageThisMonth(userId: number, operation: string) { const db = await getDb(); if (!db) return 0; const since = new Date(); since.setDate(1); const rows = await db.select({ count: sql<number>`count(*)` }).from(usageEvents).where(and(eq(usageEvents.userId, userId), eq(usageEvents.operation, operation), sql`${usageEvents.createdAt} >= ${since}`)); return Number(rows[0]?.count ?? 0); }
 export async function adminSummary() { const db = await getDb(); if (!db) return { users: 0, meals: 0, pantryItems: 0, aiOperations: 0, subscriptions: 0, failedOperations: 0, analyticsEvents: 0, failureRate: 0, mealGenerationConversion: 0, subscriptionMix: {} }; const [u, m, p, a, s, f, e, subscriptionRows] = await Promise.all([db.select({ count: sql<number>`count(*)` }).from(users), db.select({ count: sql<number>`count(*)` }).from(meals), db.select({ count: sql<number>`count(*)` }).from(pantryItems), db.select({ count: sql<number>`count(*)` }).from(usageEvents), db.select({ count: sql<number>`count(*)` }).from(subscriptions), db.select({ count: sql<number>`count(*)` }).from(usageEvents).where(eq(usageEvents.success, false)), db.select({ count: sql<number>`count(*)` }).from(analyticsEvents), db.select({ plan: subscriptions.plan, status: subscriptions.status }).from(subscriptions)]); const subscriptionMix = subscriptionRows.reduce<Record<string, number>>((acc, row) => { const key = `${row.plan}:${row.status}`; acc[key] = (acc[key] ?? 0) + 1; return acc; }, {}); const aiOperations = Number(a[0]?.count ?? 0); const failedOperations = Number(f[0]?.count ?? 0); const analyticsEventCount = Number(e[0]?.count ?? 0); return { users: Number(u[0]?.count ?? 0), meals: Number(m[0]?.count ?? 0), pantryItems: Number(p[0]?.count ?? 0), aiOperations, subscriptions: Number(s[0]?.count ?? 0), failedOperations, failureRate: aiOperations ? failedOperations / aiOperations : 0, analyticsEvents: analyticsEventCount, mealGenerationConversion: analyticsEventCount ? Number(m[0]?.count ?? 0) / analyticsEventCount : 0, subscriptionMix }; }
+
+export async function exportUserData(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [profile, pantry, mealsRows, shopping, interactions, usage, analytics, scans, subscriptionsRows] = await Promise.all([
+    db.select().from(userProfiles).where(eq(userProfiles.userId, userId)),
+    db.select().from(pantryItems).where(eq(pantryItems.userId, userId)),
+    db.select().from(meals).where(eq(meals.userId, userId)),
+    db.select().from(shoppingItems).where(eq(shoppingItems.userId, userId)),
+    db.select().from(mealInteractions).where(eq(mealInteractions.userId, userId)),
+    db.select().from(usageEvents).where(eq(usageEvents.userId, userId)),
+    db.select().from(analyticsEvents).where(eq(analyticsEvents.userId, userId)),
+    db.select().from(pantryScans).where(eq(pantryScans.userId, userId)),
+    db.select().from(subscriptions).where(eq(subscriptions.userId, userId)),
+  ]);
+  return { profile, pantry, meals: mealsRows, shopping, interactions, usage, analytics, scans, subscriptions: subscriptionsRows, exportedAt: new Date().toISOString() };
+}

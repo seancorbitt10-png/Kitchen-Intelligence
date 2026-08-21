@@ -74,4 +74,14 @@ describe("Kitchen Intelligence router contracts", () => {
     expect((await caller.pantry.list()).find(item => item.id === pantry!.id)?.quantity).toBe("5.00");
     await deletePantryItem(userId, pantry!.id);
   });
+
+  it("exports only the requesting user data through the protected privacy procedure", async () => {
+    const userId = 100000 + Math.floor(Date.now() % 900000);
+    const caller = appRouter.createCaller(context("user", userId));
+    const created = await caller.pantry.add({ name: "export oats", category: "grain", quantity: 1, unit: "bag", confidence: 1, source: "manual", location: "pantry" });
+    const exported = await caller.privacy.exportData();
+    expect(exported.pantry.some(item => item.id === created?.id)).toBe(true);
+    expect(exported.pantry.every(item => item.userId === userId)).toBe(true);
+    await deletePantryItem(userId, created!.id);
+  });
 });

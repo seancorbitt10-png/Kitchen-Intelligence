@@ -33,7 +33,7 @@ A successful build and checkpoint do not prove production readiness by themselve
 
 ## Data lifecycle policy for launch
 
-The current product supports user-controlled deletion of feedback, scan history, and the full account. A production launch owner must set and publish retention periods for analytics, AI usage metadata, and operational logs, including the legal basis and deletion schedule for each category. Database backups and restore drills must be configured through the managed hosting/database controls and tested before public launch; the application does not claim backup or restore guarantees on its own. A self-service data-export package is not implemented in this release candidate. Until export is added, support must handle validated export requests manually and the privacy surface must state that limitation clearly.
+The current product supports user-controlled deletion of feedback, scan history, and the full account, plus a self-service JSON export of the user-scoped profile, pantry, meals, shopping, interactions, usage, analytics, scan metadata, and subscription records. A production launch owner must set and publish retention periods for analytics, AI usage metadata, and operational logs, including the legal basis and deletion schedule for each category. Database backups and restore drills must be configured through the managed hosting/database controls and tested before public launch; the application does not claim backup or restore guarantees on its own.
 
 ## Edge protection and operational adapters
 

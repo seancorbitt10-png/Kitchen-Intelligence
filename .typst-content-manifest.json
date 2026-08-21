@@ -2,7 +2,7 @@
   "task_kind": "markdown-to-pdf",
   "output": "pdf",
   "signals": [],
-  "hard_constraints": [],
+  "hard_constraints": ["professional project status report"],
   "content_features": {
     "code_blocks": 0,
     "defined_terms": 0,

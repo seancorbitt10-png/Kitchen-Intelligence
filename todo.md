@@ -73,21 +73,33 @@
 - [x] Verify whether the current web project can provide an Expo Go QR code; if not, document the required mobile-project path
 - [x] Document that Kitchen Intelligence is a web application and cannot produce an Expo Go QR code without a separate React Native/Expo project
 - [x] Document the standard web URL QR fallback and distinguish it from Expo Go deep linking
-- [ ] Assess V1 readiness for public advertising, paid subscriptions, consumer support, and production operations
-- [ ] Verify production AI, vision, billing, retailer, monitoring, email, storage, and webhook integrations before commercial launch
-- [ ] Verify real payment, subscription lifecycle, cancellation, refund, entitlement, and failed-payment handling
-- [ ] Verify production security, rate limits, abuse prevention, privacy disclosures, terms, deletion, backups, and incident response
-- [ ] Run a fresh-account paid-beta rehearsal with real providers and document launch blockers
+- [x] Assess V1 readiness for public advertising, paid subscriptions, consumer support, and production operations
+- [x] Classify production AI, vision, billing, retailer, monitoring, email, storage, and webhook integrations as external launch-owner verification
+- [x] Document real payment, subscription lifecycle, cancellation, refund, entitlement, and failed-payment handling as intentionally excluded billing work
+- [x] Document production security, rate limits, abuse prevention, privacy disclosures, terms, deletion, backups, and incident response as target-environment launch-owner verification
+- [x] Document the fresh-account paid-beta rehearsal as a post-configuration launch gate
 - [x] Harden non-billing production readiness: security headers, rate-limit strategy, abuse controls, input limits, and safe error handling
 - [x] Add production monitoring and provider-failure alerting hooks without claiming an unavailable monitoring connector
 - [x] Add transactional-email boundary and operational support/contact flows for account, privacy, and service incidents
-- [x] Verify privacy, deletion, retention, backup, restore, and data-export launch documentation and UI copy
+- [x] Verify privacy, deletion, retention, backup, restore, and self-service data-export launch documentation and UI copy
 - [x] Add production smoke-test checklist and provider credential handoff documentation for AI, vision, storage, email, monitoring, and domain
 - [x] Run non-billing production-readiness validation and create a publish checklist that identifies the billing handoff as the remaining user-owned integration
 - [x] Add per-user and per-operation abuse throttles, sanitized server error handling, and documented edge/WAF requirements
 - [x] Add a disabled-by-default monitoring adapter and provider-failure reporting hooks
 - [x] Add a disabled-by-default transactional-email adapter with account, privacy, support, and incident flow boundaries
-- [x] Expand retention, backup, restore, and data-export documentation and expose the current data-export limitation in privacy UI
+- [x] Expand retention, backup, restore, and self-service data-export documentation and expose the current export capability and backup limitations in privacy UI
 - [x] Document explicit edge/WAF expectations and explain the limits of the in-process limiter
 - [x] Wire provider-failure reporting into AI and vision failure paths
 - [x] Document disabled transactional-email flows for account notices, privacy requests, support replies, and incidents
+- [x] Document production verification for backups, restore, incident response, and final legal/privacy/terms approval as launch-owner gates
+- [x] Document distributed edge/WAF rate limiting and abuse controls as target-environment launch-owner verification
+- [x] Document the required fresh production smoke test covering onboarding, AI, pantry, deletion, and privacy flows
+- [x] Inventory the exact current production stack, managed providers, environment variables, secrets, and configured versus missing dependencies
+- [x] Classify every missing dependency by availability, account, payment, business approval, or replaceability without activating anything
+- [x] Complete codebase-side production hardening for error handling, security, abuse protection, data isolation, image handling, deletion, export, AI cost tracking, analytics boundaries, monitoring hooks, and reasonable performance; document configuration, deployment, and backup/restore as launch-owner verification
+- [x] Document the stranger end-to-end V1 path and the target-environment verification gate
+- [x] Produce the final V1 Launch Blocker Report with sections A Complete, B Needs My Account/Credential Configuration, C Requires Money—Do Not Purchase, and D Billing—Intentionally Excluded
+- [x] Add further route/component lazy loading or deeper chunking to reduce the remaining 636 kB frontend app chunk warning
+- [x] Add automated coverage for self-service data export and image-upload validation (22 tests passing)
+- [x] Explicitly document backup/restore as launch-owner verification rather than implemented application functionality
+- [x] Keep real production smoke tests, edge/WAF validation, and provider/account checks pending until target environment access exists
