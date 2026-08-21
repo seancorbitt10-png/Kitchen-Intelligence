@@ -8,6 +8,8 @@ import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { apiRateLimit, securityHeaders } from "../security";
+import { reportOperationalEvent, sanitizeError } from "../operations";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -31,12 +33,19 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
-  // Configure body parser with larger size limit for file uploads
-  app.use(express.json({ limit: "50mb" }));
-  app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  app.disable("x-powered-by");
+  app.use(securityHeaders);
+  app.use(express.json({ limit: "20mb" }));
+  app.use(express.urlencoded({ limit: "2mb", extended: true }));
+  app.get("/healthz", (_req, res) => res.status(200).json({ ok: true, service: "kitchen-intelligence" }));
+  app.get("/readyz", (_req, res) => {
+    const ready = Boolean(process.env.DATABASE_URL && process.env.BUILT_IN_FORGE_API_URL && process.env.BUILT_IN_FORGE_API_KEY);
+    res.status(ready ? 200 : 503).json({ ready, billingConfigured: false });
+  });
   registerStorageProxy(app);
   registerOAuthRoutes(app);
   // tRPC API
+  app.use("/api/trpc", apiRateLimit);
   app.use(
     "/api/trpc",
     createExpressMiddleware({
@@ -50,6 +59,11 @@ async function startServer() {
   } else {
     serveStatic(app);
   }
+  app.use((error: unknown, _req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (res.headersSent) return next(error);
+    void reportOperationalEvent({ name: "unhandled_server_error", error });
+    res.status(500).json({ error: "Internal server error", detail: process.env.NODE_ENV === "production" ? undefined : sanitizeError(error) });
+  });
 
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);

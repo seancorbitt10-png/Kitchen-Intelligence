@@ -73,3 +73,21 @@
 - [x] Verify whether the current web project can provide an Expo Go QR code; if not, document the required mobile-project path
 - [x] Document that Kitchen Intelligence is a web application and cannot produce an Expo Go QR code without a separate React Native/Expo project
 - [x] Document the standard web URL QR fallback and distinguish it from Expo Go deep linking
+- [ ] Assess V1 readiness for public advertising, paid subscriptions, consumer support, and production operations
+- [ ] Verify production AI, vision, billing, retailer, monitoring, email, storage, and webhook integrations before commercial launch
+- [ ] Verify real payment, subscription lifecycle, cancellation, refund, entitlement, and failed-payment handling
+- [ ] Verify production security, rate limits, abuse prevention, privacy disclosures, terms, deletion, backups, and incident response
+- [ ] Run a fresh-account paid-beta rehearsal with real providers and document launch blockers
+- [x] Harden non-billing production readiness: security headers, rate-limit strategy, abuse controls, input limits, and safe error handling
+- [x] Add production monitoring and provider-failure alerting hooks without claiming an unavailable monitoring connector
+- [x] Add transactional-email boundary and operational support/contact flows for account, privacy, and service incidents
+- [x] Verify privacy, deletion, retention, backup, restore, and data-export launch documentation and UI copy
+- [x] Add production smoke-test checklist and provider credential handoff documentation for AI, vision, storage, email, monitoring, and domain
+- [x] Run non-billing production-readiness validation and create a publish checklist that identifies the billing handoff as the remaining user-owned integration
+- [x] Add per-user and per-operation abuse throttles, sanitized server error handling, and documented edge/WAF requirements
+- [x] Add a disabled-by-default monitoring adapter and provider-failure reporting hooks
+- [x] Add a disabled-by-default transactional-email adapter with account, privacy, support, and incident flow boundaries
+- [x] Expand retention, backup, restore, and data-export documentation and expose the current data-export limitation in privacy UI
+- [x] Document explicit edge/WAF expectations and explain the limits of the in-process limiter
+- [x] Wire provider-failure reporting into AI and vision failure paths
+- [x] Document disabled transactional-email flows for account notices, privacy requests, support replies, and incidents

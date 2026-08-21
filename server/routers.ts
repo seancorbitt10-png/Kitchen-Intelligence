@@ -9,6 +9,7 @@ import { addInteraction, addPantryItem, addShopping, adminSummary, deletePantryI
 import { analyticsEvents, mealInteractions, meals, pantryItems, pantryScans, shoppingItems, subscriptions, usageEvents, userProfiles, users } from "../drizzle/schema";
 import { and, eq } from "drizzle-orm";
 import { scoreRecommendation, entitlementAllowed, consolidateMissingIngredients } from "./domain";
+import { allowUserOperation, reportOperationalEvent } from "./operations";
 
 const list = z.array(z.string()).default([]);
 const profileInput = z.object({ householdSize: z.number().int().min(1).max(20), dietaryPreferences: list, allergies: list, cuisinePreferences: list, dislikes: list, skillLevel: z.string().min(1), cookingTime: z.string().min(1), budget: z.string().min(1), mealPriorities: list, onboardingComplete: z.boolean().default(true) });
@@ -19,7 +20,7 @@ const weeklySchema = { type: "object", additionalProperties: false, properties: 
 function parseJson<T>(value: string | null | undefined, fallback: T): T { try { return value ? JSON.parse(value) as T : fallback; } catch { return fallback; } }
 function canonical(name: string) { return name.trim().toLowerCase().replace(/\s+/g, " "); }
 function assertUser(ctx: { user: NonNullable<unknown> | null }): asserts ctx is { user: { id: number; role: string } } { if (!ctx.user) throw new TRPCError({ code: "UNAUTHORIZED" }); }
-async function requireEntitlement(userId: number, operation: "meal_generation" | "pantry_scan" | "weekly_plan" | "meal_modification") { const sub = await getSubscription(userId); const limits: Record<string, number> = { meal_generation: 8, pantry_scan: 3, weekly_plan: 1, meal_modification: 4 }; const used = await usageThisMonth(userId, operation); if (!entitlementAllowed(sub.plan as "free" | "plus" | "pro", used, limits[operation])) throw new TRPCError({ code: "FORBIDDEN", message: `You have reached the free plan limit for ${operation.replaceAll("_", " ")}.` }); return sub; }
+async function requireEntitlement(userId: number, operation: "meal_generation" | "pantry_scan" | "weekly_plan" | "meal_modification") { if (!allowUserOperation(userId, operation)) { await reportOperationalEvent({ name: "operation_rate_limited", userId, operation }); throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "This operation is temporarily rate limited. Please try again shortly." }); } const sub = await getSubscription(userId); const limits: Record<string, number> = { meal_generation: 8, pantry_scan: 3, weekly_plan: 1, meal_modification: 4 }; const used = await usageThisMonth(userId, operation); if (!entitlementAllowed(sub.plan as "free" | "plus" | "pro", used, limits[operation])) throw new TRPCError({ code: "FORBIDDEN", message: `You have reached the free plan limit for ${operation.replaceAll("_", " ")}.` }); return sub; }
 
 async function aiJson(userId: number, operation: string, messages: any[], schema: any) {
   const started = Date.now();
@@ -29,6 +30,7 @@ async function aiJson(userId: number, operation: string, messages: any[], schema
     await logUsage(userId, { operation, provider: "manus-forge", model: result.model, inputTokens: result.inputTokens, outputTokens: result.outputTokens, estimatedCost: result.estimatedCost, success: true });
     return data;
   } catch (error) {
+    await reportOperationalEvent({ name: "provider_failure", userId, operation, metadata: { provider: operation === "pantry_scan" ? "vision" : "structured-ai", durationMs: Date.now() - started }, error });
     await logUsage(userId, { operation, provider: "manus-forge", model: "configured-runtime-model", inputTokens: 0, outputTokens: 0, estimatedCost: "0", success: false });
     throw new TRPCError({ code: "BAD_GATEWAY", message: "The AI provider is unavailable right now. Please try again." });
   }
