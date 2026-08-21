@@ -1,0 +1,33 @@
+# Project TODO
+
+- [x] Establish the Kitchen Intelligence domain model and implementation boundaries
+- [x] Build the production-quality landing page with value proposition, workflow, pricing, FAQ, support, privacy, and terms links
+- [x] Implement authenticated multi-step onboarding and persist household, dietary, allergy, cuisine, dislike, skill, time, budget, and meal-priority preferences
+- [x] Implement the persistent pantry inventory model with category, quantity, unit, expiration, confidence, source, location, timestamps, and user isolation
+- [ ] Implement pantry add, edit, delete, consume, replenish, quantity adjustment, and expiration adjustment flows
+- [ ] Implement fast manual pantry entry with ingredient search and inline editing
+- [ ] Implement multi-image pantry scanning through a vision-provider abstraction with confidence thresholds and structured candidates
+- [ ] Implement scan confirmation, correction, removal, consolidation, deduplication, and commit-to-pantry flow
+- [x] Implement AI-provider abstraction for meal generation, modification, recommendations, and structured output validation
+- [ ] Implement pantry-aware recommendation scoring with allergy hard filters, dietary compatibility, preferences, occasion, time, budget, history, variety, expiration utility, and missing-ingredient penalties
+- [x] Implement natural-language meal planning with predefined and custom occasions
+- [ ] Implement meal result cards and detailed recipe pages with serving scaling, substitutions, pantry matches, missing items, save, share, regenerate, modify, and cook actions
+- [ ] Implement controlled AI meal modification with validation and persistence
+- [ ] Implement weekly meal planner with consolidated grocery list and leftover-aware planning
+- [ ] Implement pantry consumption estimates after cooking with confirmation, undo, and edit controls
+- [ ] Implement history, favorites, feedback signals, and recommendation-learning records
+- [ ] Implement shopping lists with missing-ingredient detection, consolidation, meal associations, manual CRUD, and checked state
+- [ ] Implement retailer/product provider abstractions without fabricated products, prices, inventory, or URLs
+- [ ] Implement subscription, plan, entitlement, usage limits, billing-provider boundary, and server-side access enforcement
+- [ ] Implement per-operation AI usage tracking including provider, model, tokens, estimated cost, success/failure, and timestamp
+- [ ] Implement funnel analytics instrumentation and protected admin observability for users, subscriptions, AI usage, failures, and product metrics
+- [ ] Implement privacy, AI disclosure, account deletion, data deletion, uploaded-image deletion, support, feedback, and safe error handling
+- [ ] Implement responsive mobile-first premium visual design with accessible controls, loading states, empty states, and degraded-data messaging
+- [ ] Add automated server tests for authentication, authorization, pantry, scanning boundaries, AI validation/filtering, shopping, billing entitlements, usage limits, privacy, and user isolation
+- [x] Add product documentation: README, ARCHITECTURE, PRODUCT_SPEC, IMPLEMENTATION_PLAN, AI_SYSTEM, BILLING, COST_AND_APPROVALS, TESTING, ENVIRONMENT, ANALYTICS, and PROVIDER_INTEGRATIONS
+- [x] Complete dependency, purchase, environment-variable, operating-cost, limitation, and launch-blocker audit
+- [ ] Run type checks, automated tests, build validation, responsive screenshots, and brand-new-user end-to-end QA
+- [x] Add a real Terms section or destination and keep FAQ separate from legal content
+- [x] Create the named documentation files: README, PRODUCT_SPEC, IMPLEMENTATION_PLAN, AI_SYSTEM, BILLING, COST_AND_APPROVALS, TESTING, ENVIRONMENT, ANALYTICS, and PROVIDER_INTEGRATIONS
+- [x] Add a quantified operating-cost scenario table or an explicit blocked-by-missing-pricing report for each required provider
+- [x] Add a dedicated comprehensive limitations section to the launch audit

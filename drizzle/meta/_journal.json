@@ -1,5 +1,27 @@
 {
   "version": "7",
   "dialect": "mysql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1787269071947,
+      "tag": "0000_rainy_shinko_yamashiro",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1787269856029,
+      "tag": "0001_broken_hitman",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1787269896218,
+      "tag": "0002_misty_luckman",
+      "breakpoints": true
+    }
+  ]
 }

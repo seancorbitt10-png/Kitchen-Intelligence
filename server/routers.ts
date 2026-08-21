@@ -1,28 +1,78 @@
+import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { aiProvider, visionProvider } from "./providers";
+import { addInteraction, addPantryItem, addShopping, adminSummary, deletePantryItem, deleteShopping, getPantryItem, getProfile, getSubscription, listMeals, listPantry, listShopping, logAnalytics, logUsage, saveMeal, saveProfile, saveScan, updatePantryItem, updateShopping, usageThisMonth, getDb } from "./db";
+import { analyticsEvents, mealInteractions, meals, pantryItems, pantryScans, shoppingItems, subscriptions, usageEvents, userProfiles, users } from "../drizzle/schema";
+import { and, eq } from "drizzle-orm";
+
+const list = z.array(z.string()).default([]);
+const profileInput = z.object({ householdSize: z.number().int().min(1).max(20), dietaryPreferences: list, allergies: list, cuisinePreferences: list, dislikes: list, skillLevel: z.string().min(1), cookingTime: z.string().min(1), budget: z.string().min(1), mealPriorities: list, onboardingComplete: z.boolean().default(true) });
+const pantryInput = z.object({ name: z.string().min(1).max(160), category: z.string().min(1), quantity: z.number().positive().max(100000), unit: z.string().min(1), expirationDate: z.coerce.date().optional().nullable(), confidence: z.number().min(0).max(1).default(1), source: z.string().default("manual"), location: z.string().optional().default("pantry") });
+const mealSchema = { type: "object", additionalProperties: false, properties: { title: { type: "string" }, description: { type: "string" }, servings: { type: "integer" }, prepTime: { type: "integer" }, cookTime: { type: "integer" }, difficulty: { type: "string" }, occasion: { type: "string" }, ingredients: { type: "array", items: { type: "object", additionalProperties: false, properties: { name: { type: "string" }, quantity: { type: "number" }, unit: { type: "string" }, pantryMatch: { type: "boolean" } }, required: ["name", "quantity", "unit", "pantryMatch"] } }, instructions: { type: "array", items: { type: "string" } }, missingIngredients: { type: "array", items: { type: "string" } }, substitutions: { type: "array", items: { type: "string" } }, dietaryTags: { type: "array", items: { type: "string" } } }, required: ["title", "description", "servings", "prepTime", "cookTime", "difficulty", "occasion", "ingredients", "instructions", "missingIngredients", "substitutions", "dietaryTags"] } as const;
+
+function parseJson<T>(value: string | null | undefined, fallback: T): T { try { return value ? JSON.parse(value) as T : fallback; } catch { return fallback; } }
+function canonical(name: string) { return name.trim().toLowerCase().replace(/\s+/g, " "); }
+function assertUser(ctx: { user: NonNullable<unknown> | null }): asserts ctx is { user: { id: number; role: string } } { if (!ctx.user) throw new TRPCError({ code: "UNAUTHORIZED" }); }
+
+async function aiJson(userId: number, operation: string, messages: any[], schema: any) {
+  const started = Date.now();
+  try {
+    const result = operation === "pantry_scan" ? await visionProvider.analyzeImages({ operation, messages, schema }) : await aiProvider.generateStructured({ operation, messages, schema });
+    const data = result.data as any;
+    await logUsage(userId, { operation, provider: "manus-forge", model: result.model, inputTokens: result.inputTokens, outputTokens: result.outputTokens, estimatedCost: result.estimatedCost, success: true });
+    return data;
+  } catch (error) {
+    await logUsage(userId, { operation, provider: "manus-forge", model: "configured-runtime-model", inputTokens: 0, outputTokens: 0, estimatedCost: "0", success: false });
+    throw new TRPCError({ code: "BAD_GATEWAY", message: "The AI provider is unavailable right now. Please try again." });
+  }
+}
 
 export const appRouter = router({
-    // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
-  auth: router({
-    me: publicProcedure.query(opts => opts.ctx.user),
-    logout: publicProcedure.mutation(({ ctx }) => {
-      const cookieOptions = getSessionCookieOptions(ctx.req);
-      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
-      return {
-        success: true,
-      } as const;
-    }),
+  auth: router({ me: publicProcedure.query(opts => opts.ctx.user), logout: publicProcedure.mutation(({ ctx }) => { const cookieOptions = getSessionCookieOptions(ctx.req); ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 }); return { success: true } as const; }) }),
+  profile: router({
+    get: protectedProcedure.query(({ ctx }) => getProfile(ctx.user.id)),
+    save: protectedProcedure.input(profileInput).mutation(({ ctx, input }) => saveProfile(ctx.user.id, { ...input, dietaryPreferences: JSON.stringify(input.dietaryPreferences), allergies: JSON.stringify(input.allergies), cuisinePreferences: JSON.stringify(input.cuisinePreferences), dislikes: JSON.stringify(input.dislikes), mealPriorities: JSON.stringify(input.mealPriorities) })),
   }),
-
-  // TODO: add feature routers here, e.g.
-  // todo: router({
-  //   list: protectedProcedure.query(({ ctx }) =>
-  //     db.getUserTodos(ctx.user.id)
-  //   ),
-  // }),
+  pantry: router({
+    list: protectedProcedure.query(({ ctx }) => listPantry(ctx.user.id)),
+    add: protectedProcedure.input(pantryInput).mutation(async ({ ctx, input }) => addPantryItem(ctx.user.id, { ...input, expirationDate: input.expirationDate ?? undefined, canonicalName: canonical(input.name), quantity: String(input.quantity), confidence: String(input.confidence), source: input.source ?? "manual", location: input.location ?? "pantry" })),
+    update: protectedProcedure.input(pantryInput.partial().extend({ id: z.number().int().positive() })).mutation(({ ctx, input }) => { const { id, ...data } = input; return updatePantryItem(ctx.user.id, id, ({ ...data, expirationDate: data.expirationDate ?? undefined, ...(data.name ? { canonicalName: canonical(data.name) } : {}), ...(data.quantity !== undefined ? { quantity: String(data.quantity) } : {}), ...(data.confidence !== undefined ? { confidence: String(data.confidence) } : {}) } as any)); }),
+    remove: protectedProcedure.input(z.object({ id: z.number().int().positive() })).mutation(({ ctx, input }) => deletePantryItem(ctx.user.id, input.id)),
+    consume: protectedProcedure.input(z.object({ id: z.number().int().positive(), quantity: z.number().positive() })).mutation(async ({ ctx, input }) => { const item = await getPantryItem(ctx.user.id, input.id); if (!item) throw new TRPCError({ code: "NOT_FOUND" }); const remaining = Math.max(0, Number(item.quantity) - input.quantity); return updatePantryItem(ctx.user.id, input.id, { quantity: String(remaining) }); }),
+    replenish: protectedProcedure.input(z.object({ id: z.number().int().positive(), quantity: z.number().positive() })).mutation(async ({ ctx, input }) => { const item = await getPantryItem(ctx.user.id, input.id); if (!item) throw new TRPCError({ code: "NOT_FOUND" }); return updatePantryItem(ctx.user.id, input.id, { quantity: String(Number(item.quantity) + input.quantity) }); }),
+    scan: protectedProcedure.input(z.object({ images: z.array(z.string().min(20)).min(1).max(6), threshold: z.number().min(0).max(1).default(0.65) })).mutation(async ({ ctx, input }) => {
+      const content = [{ type: "text", text: `Analyze these kitchen images. Return only likely food ingredients above confidence ${input.threshold}. Do not invent items. For each candidate provide normalized name, category, estimated quantity, unit, confidence, and possible variants.` }, ...input.images.map(url => ({ type: "image_url", image_url: { url, detail: "auto" } }))];
+      const schema = { type: "object", additionalProperties: false, properties: { candidates: { type: "array", items: { type: "object", additionalProperties: false, properties: { name: { type: "string" }, category: { type: "string" }, quantity: { type: "number" }, unit: { type: "string" }, confidence: { type: "number" }, variants: { type: "array", items: { type: "string" } } }, required: ["name", "category", "quantity", "unit", "confidence", "variants"] } } }, required: ["candidates"] } as const;
+      const result = await aiJson(ctx.user.id, "pantry_scan", [{ role: "system", content: "You identify visible food conservatively. Unknowns must be omitted." }, { role: "user", content }], schema);
+      return { candidates: (result.candidates ?? []).filter((item: any) => Number(item.confidence) >= input.threshold), imageCount: input.images.length };
+    }),
+    confirmScan: protectedProcedure.input(z.object({ imageCount: z.number().int().min(1), candidates: z.array(pantryInput) })).mutation(async ({ ctx, input }) => { for (const item of input.candidates) await addPantryItem(ctx.user.id, { ...item, canonicalName: canonical(item.name), quantity: String(item.quantity), confidence: String(item.confidence), source: "image_scan", location: item.location ?? "pantry" }); await saveScan(ctx.user.id, input.imageCount, JSON.stringify(input.candidates)); return listPantry(ctx.user.id); }),
+  }),
+  meals: router({
+    recent: protectedProcedure.query(({ ctx }) => listMeals(ctx.user.id)),
+    generate: protectedProcedure.input(z.object({ request: z.string().min(3).max(1000), occasion: z.string().default("Everyday") })).mutation(async ({ ctx, input }) => {
+      const profile = await getProfile(ctx.user.id); const pantry = await listPantry(ctx.user.id); const used = await usageThisMonth(ctx.user.id, "meal_generation"); const sub = await getSubscription(ctx.user.id); if (sub.plan === "free" && used >= 8) throw new TRPCError({ code: "FORBIDDEN", message: "You have reached the free plan's monthly meal generation limit." });
+      const context = { request: input.request, occasion: input.occasion, pantry: pantry.map(item => ({ name: item.name, quantity: Number(item.quantity), unit: item.unit, expirationDate: item.expirationDate })), profile: profile ? { householdSize: profile.householdSize, dietaryPreferences: parseJson(profile.dietaryPreferences, []), allergies: parseJson(profile.allergies, []), cuisines: parseJson(profile.cuisinePreferences, []), dislikes: parseJson(profile.dislikes, []), skill: profile.skillLevel, cookingTime: profile.cookingTime, budget: profile.budget, priorities: parseJson(profile.mealPriorities, []) } : null };
+      const result = await aiJson(ctx.user.id, "meal_generation", [{ role: "system", content: "You are a careful kitchen intelligence meal planner. Allergies are hard constraints. Use pantry matches honestly, state missing ingredients, and never invent pantry or product facts." }, { role: "user", content: JSON.stringify(context) }], mealSchema);
+      const saved = await saveMeal(ctx.user.id, result.title, result.description, JSON.stringify(result)); await logAnalytics(ctx.user.id, "meal_generated", JSON.stringify({ occasion: input.occasion })); return { ...result, id: saved?.id ?? 0 };
+    }),
+    modify: protectedProcedure.input(z.object({ meal: z.any(), request: z.string().min(3).max(800) })).mutation(async ({ ctx, input }) => aiJson(ctx.user.id, "meal_modification", [{ role: "system", content: "Modify the provided recipe in place. Preserve its identity unless the requested change makes that impossible. Keep allergy safety and structured output." }, { role: "user", content: JSON.stringify({ meal: input.meal, request: input.request }) }], mealSchema)),
+    interact: protectedProcedure.input(z.object({ mealId: z.number().int().positive(), type: z.enum(["viewed", "saved", "rejected", "cooked", "favorite", "not_interested", "again"]) })).mutation(async ({ ctx, input }) => { await addInteraction(ctx.user.id, input.mealId, input.type); await logAnalytics(ctx.user.id, `meal_${input.type}`); return true; }),
+  }),
+  shopping: router({
+    list: protectedProcedure.query(({ ctx }) => listShopping(ctx.user.id)),
+    add: protectedProcedure.input(z.object({ name: z.string().min(1), quantity: z.number().positive().default(1), unit: z.string().default("item"), mealTitle: z.string().optional() })).mutation(({ ctx, input }) => addShopping(ctx.user.id, { ...input, quantity: String(input.quantity) })),
+    toggle: protectedProcedure.input(z.object({ id: z.number().int().positive(), checked: z.boolean() })).mutation(({ ctx, input }) => updateShopping(ctx.user.id, input.id, { checked: input.checked })),
+    remove: protectedProcedure.input(z.object({ id: z.number().int().positive() })).mutation(({ ctx, input }) => deleteShopping(ctx.user.id, input.id)),
+    fromMeal: protectedProcedure.input(z.object({ meal: z.any() })).mutation(async ({ ctx, input }) => { const missing = Array.isArray(input.meal.missingIngredients) ? input.meal.missingIngredients : []; for (const name of missing) await addShopping(ctx.user.id, { name, quantity: "1", unit: "item", mealTitle: input.meal.title, checked: false }); return listShopping(ctx.user.id); }),
+  }),
+  billing: router({ status: protectedProcedure.query(({ ctx }) => getSubscription(ctx.user.id)), startCheckout: protectedProcedure.mutation(() => { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Billing provider credentials are not configured. Connect a billing provider before enabling checkout." }); }) }),
+  privacy: router({ deleteAccount: protectedProcedure.input(z.object({ confirm: z.literal("DELETE MY ACCOUNT") })).mutation(async ({ ctx }) => { const db = await getDb(); if (!db) return { success: false }; await db.delete(analyticsEvents).where(eq(analyticsEvents.userId, ctx.user.id)); await db.delete(usageEvents).where(eq(usageEvents.userId, ctx.user.id)); await db.delete(mealInteractions).where(eq(mealInteractions.userId, ctx.user.id)); await db.delete(meals).where(eq(meals.userId, ctx.user.id)); await db.delete(shoppingItems).where(eq(shoppingItems.userId, ctx.user.id)); await db.delete(pantryScans).where(eq(pantryScans.userId, ctx.user.id)); await db.delete(pantryItems).where(eq(pantryItems.userId, ctx.user.id)); await db.delete(subscriptions).where(eq(subscriptions.userId, ctx.user.id)); await db.delete(userProfiles).where(eq(userProfiles.userId, ctx.user.id)); await db.delete(users).where(eq(users.id, ctx.user.id)); return { success: true }; }) }),
+  admin: router({ summary: protectedProcedure.query(async ({ ctx }) => { if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" }); return adminSummary(); }) }),
 });
-
 export type AppRouter = typeof appRouter;
