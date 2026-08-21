@@ -58,10 +58,14 @@
 - [x] Expand admin KPIs with subscription mix, failure rate, and funnel conversion metrics
 - [x] Add feedback-specific deletion coverage and mutation error tests
 - [x] Add an automated test for scaled missing-ingredient shopping payload generation
-- [ ] Add focused router-level tests for pantry, scan, shopping, privacy, authorization, billing entitlements, usage limits, and user isolation
-- [ ] Document a true new-user end-to-end QA flow from onboarding through pantry, meal generation, shopping, and privacy controls
-- [ ] Add automated cook and undo-cook tests including edited consumption quantities
-- [ ] Add integration tests for modified-meal persistence and usage-event logging with mocked providers/database boundaries
-- [ ] Add subscription plan/status mix metrics to admin summary and UI
-- [ ] Add feedback-deletion and mutation-error tests
-- [ ] Add a router-level shopping fromMeal test for scaled missing-ingredient quantities
+- [x] Add focused router-level tests for pantry, scan, shopping, privacy, authorization, billing entitlements, usage limits, and user isolation
+- [x] Document a true new-user end-to-end QA flow from onboarding through pantry, meal generation, shopping, and privacy controls
+- [x] Add automated cook and undo-cook tests including edited consumption quantities
+- [x] Add integration tests for modified-meal persistence and usage-event logging with mocked providers/database boundaries
+- [x] Add subscription plan/status mix metrics to admin summary and UI
+- [x] Add feedback-deletion and mutation-error tests
+- [x] Add a router-level shopping fromMeal test for scaled missing-ingredient quantities
+- [x] Add scan-flow, entitlement-limit, pantry-mutation, and cross-user-isolation router tests
+- [x] Add a successful undo-cook integration test that verifies pantry restoration after edited consumption
+- [x] Add a mocked meals.modify integration test covering saved history and usage logging
+- [x] Add automated delete-feedback success and mutation-error-path tests
