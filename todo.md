@@ -69,3 +69,7 @@
 - [x] Add a successful undo-cook integration test that verifies pantry restoration after edited consumption
 - [x] Add a mocked meals.modify integration test covering saved history and usage logging
 - [x] Add automated delete-feedback success and mutation-error-path tests
+- [x] Separate and proportionally size mobile bottom-taskbar labels so navigation words never merge
+- [x] Verify whether the current web project can provide an Expo Go QR code; if not, document the required mobile-project path
+- [x] Document that Kitchen Intelligence is a web application and cannot produce an Expo Go QR code without a separate React Native/Expo project
+- [x] Document the standard web URL QR fallback and distinguish it from Expo Go deep linking
