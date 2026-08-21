@@ -4,7 +4,7 @@ Kitchen Intelligence is a full-stack AI kitchen companion centered on a persiste
 
 ## What is implemented
 
-The current application includes a public landing page, Manus OAuth authentication, multi-step onboarding, persisted user preferences, user-scoped pantry data, manual pantry entry, multi-image scan submission with review, structured AI meal generation and modification, occasion selection, recipe detail, missing-ingredient shopping lists, meal history, profile and account deletion controls, server-side free-plan generation limits, AI usage rows, analytics events, and protected admin summary metrics.
+The current application includes a public landing page, Manus OAuth authentication, multi-step onboarding, persisted and recommendation-aware user preferences, user-scoped pantry data, manual pantry entry, multi-image scan submission with review, structured AI meal generation and modification, occasion selection including Holiday, recipe detail and serving scaling, weekly planning with leftover outputs, consolidated shopping lists, cooking reconciliation with undo, meal history and interaction signals, profile/export/deletion controls, server-side free-plan generation limits, AI usage rows, analytics events, operational failure hooks, and protected admin summary metrics.
 
 ## Development
 
@@ -12,7 +12,7 @@ Run `pnpm install`, then `pnpm dev` for the local server. Use `pnpm check` for T
 
 ## Environment
 
-Authentication, database, and built-in AI environment values are injected by the managed project. Billing, retailer/product discovery, monitoring, email, and durable image-retention integrations are not configured. See `docs/LAUNCH_AUDIT.md` and `docs/TESTING_AND_OPERATIONS.md` before commercial launch.
+Authentication, database, and built-in AI environment values are injected by the managed project. Billing, retailer/product discovery, external monitoring, transactional email, and durable image-retention integrations are intentionally not activated. See `docs/ENVIRONMENT.md`, `docs/V1_FINAL_AUDIT_CHECKLIST.md`, `docs/V1_LAUNCH_BLOCKER_REPORT.md`, and `docs/TESTING_AND_OPERATIONS.md` before commercial launch.
 
 ## Product boundaries
 

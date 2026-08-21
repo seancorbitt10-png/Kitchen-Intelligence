@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canonicalIngredientName, pantryMatchScore, safeJson, scaleMeal, scoreRecommendation, entitlementAllowed, consolidateMissingIngredients } from "./domain";
+import { canonicalIngredientName, pantryMatchScore, safeJson, scaleMeal, scoreRecommendation, entitlementAllowed, consolidateMissingIngredients, validateMealResult, validateWeeklyResult, validateScanCandidates } from "./domain";
 
 describe("kitchen domain utilities", () => {
   it("normalizes ingredient aliases without collapsing meaningful words", () => {
@@ -37,5 +37,16 @@ describe("kitchen domain utilities", () => {
 
   it("consolidates scaled missing ingredients", () => {
     expect(consolidateMissingIngredients([{ name: "Lime", quantity: 2, unit: "each" }, { name: " lime ", quantity: 1, unit: "each" }])).toEqual([{ name: "Lime", quantity: 3, unit: "each" }]);
+  });
+
+  it("rejects impossible structured meal payloads", () => {
+    expect(validateMealResult({ title: "", description: "", servings: 0, prepTime: -1, cookTime: 10, ingredients: [], instructions: [], missingIngredients: [], substitutions: [], dietaryTags: [] })).toBe(false);
+    expect(validateMealResult({ title: "Pasta", description: "Simple", servings: 2, prepTime: 10, cookTime: 10, difficulty: "easy", occasion: "Everyday", ingredients: [{ name: "pasta", quantity: 1, unit: "cup", pantryMatch: true }], instructions: ["Cook"], missingIngredients: [], substitutions: [], dietaryTags: [] })).toBe(true);
+  });
+
+  it("rejects malformed weekly and scan payloads", () => {
+    expect(validateWeeklyResult({ days: [], groceryList: [], leftoverPlan: [] })).toBe(false);
+    expect(validateScanCandidates({ candidates: [{ name: "mystery", category: "other", quantity: 0, unit: "item", confidence: 1.2, variants: [] }] })).toBe(false);
+    expect(validateScanCandidates({ candidates: [{ name: "tomato", category: "produce", quantity: 2, unit: "each", confidence: 0.9, variants: [] }] })).toBe(true);
   });
 });

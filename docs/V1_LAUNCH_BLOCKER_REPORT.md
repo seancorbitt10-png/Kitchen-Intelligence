@@ -1,7 +1,7 @@
 # Kitchen Intelligence — Final V1 Completion and Launch-Blocker Report
 
 **Assessment date:** August 21, 2026  
-**Audit base:** checkpoint `e9dde7b4` plus the final non-billing hardening pass  
+**Audit base:** checkpoint `6fd35180` plus the final shutdown cleanup and non-billing hardening pass  
 **Scope:** Everything that can be completed without billing, payment processing, purchasing, or activating external services.
 
 ## 1. COMPLETED TODAY
@@ -12,7 +12,7 @@ The scan path now surfaces client-side file-read failures, confirms scan mutatio
 
 Product analytics coverage was expanded for onboarding completion, pantry additions, updates, removals, consumption, replenishment, scan confirmation, shopping mutations, shopping-list creation, and existing meal/planning/cooking interactions. Account deletion now runs through an atomic database transaction across owned records. Self-service export excludes provider customer and subscription identifiers while retaining useful user-owned plan status and operational history.
 
-Production metadata was improved with description, theme, and Open Graph tags. The environment documentation now contains a safe variable matrix. The testing and operations documentation was reconciled with actual current behavior. A final audit checklist was created, and the launch report was rewritten to separate completed engineering from owner-only production verification.
+Production metadata was improved with description, theme, and Open Graph tags. The environment documentation now contains a safe variable matrix. The testing and operations documentation was reconciled with actual current behavior. The final cleanup removed misleading hardcoded pantry content from authenticated UI, replaced the unsupported meal-count claim with truthful meal-context language, added duplicate-submission protection for onboarding, weekly planning, and scan confirmation, and added controlled errors for remaining pantry, shopping, interaction, and share actions. Deterministic validators now reject impossible meal, weekly-plan, and scan payloads before persistence or success analytics. Historical progress documentation was reconciled with the current checkpoint.
 
 Billing remains intentionally disabled and fail-closed. No provider, hosting, payment, retailer, monitoring, email, or durable-storage purchase or activation was performed.
 
@@ -21,10 +21,10 @@ Billing remains intentionally disabled and fail-closed. No provider, hosting, pa
 | Verification | Result |
 |---|---|
 | TypeScript check | Passed |
-| Automated tests | **23 tests across 6 files passed** |
+| Automated tests | **25 tests across 6 files passed** |
 | Production build | Passed |
 | AI usage metadata | Provider/model/token/cost calculation covered |
-| Malformed AI output | Rejected before persistence boundary |
+| Malformed and impossible AI output | Rejected before persistence boundary for meal, weekly-plan, and scan payloads |
 | Image validation | Supported type, size, and six-file cap covered |
 | User isolation | Router-level cross-user tests passed |
 | Pantry and shopping contracts | CRUD, consolidation, serving scaling, and mutation tests passed |
@@ -32,7 +32,7 @@ Billing remains intentionally disabled and fail-closed. No provider, hosting, pa
 | Cook/undo flow | Edited consumption and pantry restoration tested |
 | Privacy | Export isolation, deletion boundaries, feedback deletion, and scan-history deletion tested at router level |
 | Responsive UI | Desktop and 390×844 mobile screenshots captured; mobile taskbar labels remain separated and proportional |
-| Runtime logs | No new browser-console failure was observed during the screenshot verification pass; dev server restarted cleanly after changes |
+| Runtime logs | No new browser-console failure was observed during the final screenshot verification pass; dev server restarted cleanly after changes. The only observed log note is a non-blocking stale `baseline-browser-mapping` maintenance warning. |
 
 These results verify the codebase and sandbox behavior. They do **not** constitute a production backup/restore drill, distributed WAF test, permanent-domain test, or fresh-account test using the owner’s target production configuration.
 
@@ -95,4 +95,4 @@ Retailer/product discovery, durable image retention, richer acquisition attribut
 | Paid beta readiness excluding billing integration | **68%** |
 | Public launch readiness excluding billing | **72%** |
 
-The engineering work that is reasonably solvable inside the current environment is complete enough for release-candidate review. The project should **not** be represented as ready to sell subscriptions yet. It is ready for the next owner-controlled phase: configure the target environment, verify genuine AI/vision behavior with a clean account and real images, complete backup/restore and edge controls, approve legal copy, and then handle billing separately.
+The engineering work that is reasonably solvable inside the current environment is complete enough for release-candidate review, with the shutdown cleanup pass now complete at the codebase boundary. The project should **not** be represented as ready to sell subscriptions yet. It is ready for the next owner-controlled phase: configure the target environment, verify genuine AI/vision behavior with a clean account and real images, complete backup/restore and edge controls, approve legal copy, and then handle billing separately.

@@ -99,8 +99,8 @@
 - [x] Complete codebase-side production hardening for error handling, security, abuse protection, data isolation, image handling, deletion, export, AI cost tracking, analytics boundaries, monitoring hooks, and reasonable performance; document configuration, deployment, and backup/restore as launch-owner verification
 - [x] Document the stranger end-to-end V1 path and the target-environment verification gate
 - [x] Produce the final V1 Launch Blocker Report with the requested seven sections: completed today, verified, remaining owner configuration, requires purchase, billing, remaining blockers, and final status
-- [x] Add further route/component lazy loading or deeper chunking to reduce the remaining 636 kB frontend app chunk warning
-- [x] Add automated coverage for self-service data export and image-upload validation (23 tests passing)
+- [x] Add further route/component lazy loading or deeper chunking; document the remaining non-critical bundle optimization opportunity
+- [x] Add automated coverage for self-service data export, image-upload validation, and strict AI payload validation (25 tests passing)
 - [x] Explicitly document backup/restore as launch-owner verification rather than implemented application functionality
 - [x] Keep real production smoke tests, edge/WAF validation, and provider/account checks pending until target environment access exists
 
@@ -113,3 +113,12 @@
 - [x] Verify user isolation across pantry, scans, meals, history, preferences, shopping, analytics, AI usage, and account data at router/database boundaries
 - [x] Verify codebase deployment configuration, environment boundaries, health/readiness, and documented migration/backup/restore/domain/email/monitoring/edge-WAF readiness without activating external services
 - [x] Reconcile the final completion percentage and launch blockers in the V1 Launch Blocker Report after this audit
+
+# Final shutdown cleanup pass
+
+- [x] Audit checkpoint 6fd35180 for TODOs, FIXMEs, placeholders, dead code, stale documentation, mock data, hardcoded development assumptions, unused imports, and misleading UI claims
+- [x] Verify final API, authorization, privacy, data-lifecycle, and provider-failure boundaries; fix only safe engineering-level defects
+- [x] Verify final product-flow and failure-state coverage; document any checks that require owner accounts or production access
+- [x] Reconcile all documentation and environment/configuration claims with the actual implementation
+- [x] Run final type check, tests, production build, health/readiness, runtime-log, and responsive verification
+- [x] Create the final shutdown handoff checkpoint and report

@@ -2,7 +2,7 @@
 ## Current Project Progress Report
 
 **Status date:** August 21, 2026  
-**Current checkpoint:** `b42fe5b7`  
+**Current checkpoint:** `6fd35180`  
 **Project type:** Responsive full-stack web SaaS  
 **Billing:** Intentionally not connected
 
@@ -22,7 +22,7 @@ The project is **not yet a fully commercial public V1**. Billing checkout and th
 | AI meal planning | Implemented behind provider boundary | Structured generation, modification, recommendation signals, allergy rejection, usage logging, and cost fields are present. |
 | Weekly planning | Implemented | Day-by-day planning, consolidated shopping payloads, serving scaling, and explicit leftover carry-forward outputs are present. |
 | Shopping | Implemented boundary | Missing ingredients, quantity consolidation, manual edits, checked state, and disabled retailer adapter are present. |
-| Privacy | Implemented with stated limitation | Account, scan-history, and feedback deletion controls exist. Self-service data export is not yet available. |
+| Privacy | Implemented release-candidate capability | Account, scan-history, and feedback deletion controls, atomic account deletion, and protected self-service JSON export are present. |
 | Admin | Implemented | Protected metrics include users, meals, pantry items, AI operations, subscriptions, failures, analytics, failure rate, conversion, and subscription mix. |
 | Security hardening | Release-candidate level | Headers, body limits, sanitized errors, in-process IP limiting, and per-user operation throttles are implemented. A distributed WAF/edge policy is still required for public scale. |
 | Monitoring and email | Disabled adapters | Provider-failure reporting and email flow boundaries exist, but no external alerting or transactional-email provider is connected. |
@@ -35,12 +35,12 @@ The latest validation run completed successfully:
 | Check | Result |
 | --- | --- |
 | TypeScript validation (`pnpm check`) | Passed |
-| Automated tests | 19 tests passed across 5 test files |
+| Automated tests | 25 tests passed across 6 test files |
 | Production build (`pnpm build`) | Passed |
 | Responsive mobile verification | Passed for the revised bottom taskbar |
-| Current checkpoint | `b42fe5b7` |
+| Current checkpoint | `6fd35180` |
 
-The production bundle reports a non-blocking Vite warning about a JavaScript chunk larger than 500 kB. This is suitable for the current release candidate but should be addressed with code-splitting before significant acquisition traffic.
+The production bundle remains within the documented release-candidate performance tradeoff after vendor chunking and workspace lazy loading. The main application chunk is still a non-critical optimization opportunity before significant acquisition traffic, but the production build completes successfully.
 
 ## What remains before public paid V1
 

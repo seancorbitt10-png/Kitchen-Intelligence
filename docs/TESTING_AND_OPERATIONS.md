@@ -2,7 +2,7 @@
 
 ## Automated coverage
 
-The current codebase passes the TypeScript check, the Vitest suite, and the production build. The suite covers authentication logout behavior, deterministic kitchen-domain utilities, AI usage metadata, malformed structured-output rejection, image-upload validation, router authorization and user isolation, pantry mutations, scan input boundaries, shopping consolidation and serving scaling, entitlement limits, cook/undo behavior, privacy deletion boundaries, and self-service export isolation. The current baseline is **23 tests across 6 files**. This is focused contract coverage rather than a claim that a sandbox run replaces production verification.
+The current codebase passes the TypeScript check, the Vitest suite, and the production build. The suite covers authentication logout behavior, deterministic kitchen-domain utilities, AI usage metadata, malformed structured-output rejection, image-upload validation, router authorization and user isolation, pantry mutations, scan input boundaries, shopping consolidation and serving scaling, entitlement limits, cook/undo behavior, privacy deletion boundaries, and self-service export isolation. The current baseline is **25 tests across 6 files**. This is focused contract coverage rather than a claim that a sandbox run replaces production verification.
 
 ## Production verification still required
 
@@ -10,7 +10,7 @@ Before public launch, the owner must run the fresh-account end-to-end journey wi
 
 ## AI safety contract
 
-AI output is requested as structured JSON and is validated before rendering or persistence. Allergy data is treated as a hard constraint in the meal prompt. Pantry vision results remain candidates until confirmation. The application must distinguish known, inferred, and unknown information and must not invent prices, products, availability, expiration certainty, nutrition precision, or food-safety guarantees.
+AI output is requested as structured JSON and is validated before rendering or persistence. Deterministic domain validators reject impossible meal quantities/servings/times, incomplete weekly plans, and invalid scan confidence or quantities before the success boundary. Allergy data is treated as a hard constraint in the meal prompt. Pantry vision results remain candidates until confirmation. The application must distinguish known, inferred, and unknown information and must not invent prices, products, availability, expiration certainty, nutrition precision, or food-safety guarantees.
 
 ## Analytics and usage
 

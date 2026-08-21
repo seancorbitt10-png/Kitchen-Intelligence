@@ -11,3 +11,23 @@ export function scoreRecommendation(signals: RecommendationSignals) { if (signal
 export function entitlementAllowed(plan: "free" | "plus" | "pro", used: number, limit: number) { return plan !== "free" || used < limit; }
 
 export function consolidateMissingIngredients(missing: Array<{ name: string; quantity: number; unit: string }>) { const result = new Map<string, { name: string; quantity: number; unit: string }>(); for (const item of missing) { const key = canonicalIngredientName(item.name); const existing = result.get(key); result.set(key, existing ? { ...existing, quantity: existing.quantity + item.quantity } : { ...item }); } return Array.from(result.values()); }
+
+export function validateMealResult(value: any) {
+  if (!value || typeof value.title !== "string" || !value.title.trim() || typeof value.description !== "string") return false;
+  if (!Number.isInteger(value.servings) || value.servings < 1 || value.servings > 50) return false;
+  if (!["prepTime", "cookTime"].every(key => Number.isInteger(value[key]) && value[key] >= 0 && value[key] <= 1440)) return false;
+  if (!Array.isArray(value.ingredients) || value.ingredients.length === 0 || !Array.isArray(value.instructions) || value.instructions.length === 0) return false;
+  if (!value.ingredients.every((item: any) => item && typeof item.name === "string" && item.name.trim() && typeof item.unit === "string" && item.unit.trim() && Number.isFinite(item.quantity) && item.quantity > 0 && typeof item.pantryMatch === "boolean")) return false;
+  if (!Array.isArray(value.missingIngredients) || !value.missingIngredients.every((item: any) => typeof item === "string")) return false;
+  if (!Array.isArray(value.substitutions) || !value.substitutions.every((item: any) => typeof item === "string")) return false;
+  if (!Array.isArray(value.dietaryTags) || !value.dietaryTags.every((item: any) => typeof item === "string")) return false;
+  return value.instructions.every((item: any) => typeof item === "string" && item.trim());
+}
+
+export function validateWeeklyResult(value: any) {
+  return Boolean(value && Array.isArray(value.days) && value.days.length >= 3 && value.days.every((day: any) => day && typeof day.day === "string" && typeof day.title === "string") && Array.isArray(value.groceryList) && Array.isArray(value.leftoverPlan));
+}
+
+export function validateScanCandidates(value: any) {
+  return Boolean(value && Array.isArray(value.candidates) && value.candidates.every((item: any) => item && typeof item.name === "string" && item.name.trim() && typeof item.category === "string" && Number.isFinite(item.quantity) && item.quantity > 0 && typeof item.unit === "string" && item.unit.trim() && Number.isFinite(item.confidence) && item.confidence >= 0 && item.confidence <= 1 && Array.isArray(item.variants) && item.variants.every((variant: any) => typeof variant === "string")));
+}
