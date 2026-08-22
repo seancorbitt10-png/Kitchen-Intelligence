@@ -122,3 +122,13 @@
 - [x] Reconcile all documentation and environment/configuration claims with the actual implementation
 - [x] Run final type check, tests, production build, health/readiness, runtime-log, and responsive verification
 - [x] Create the final shutdown handoff checkpoint and report
+
+# Final GitHub backup / project handoff
+
+- [ ] Inspect current repository, branch, remote, HEAD, recent commits, staged/unstaged changes, and untracked files
+- [ ] Verify checkpoint 197f469b alignment with the current working tree and identify legitimate post-checkpoint changes
+- [ ] Audit tracked and untracked files for secrets, credentials, private runtime data, uploaded images, local databases, logs, and unrelated files
+- [ ] Review .gitignore for appropriate project-specific exclusions without blindly changing it
+- [ ] Verify required source, schema, migrations, configuration, tests, assets, and handoff documentation are represented in version control
+- [ ] Commit and push only legitimate secret-free changes if the remote is configured and push is authorized
+- [ ] Verify the remote branch, commit hash, file presence, clean working tree, and backup outcome
