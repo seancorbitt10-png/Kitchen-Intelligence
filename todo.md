@@ -135,6 +135,6 @@
 
 # User-provided GitHub backup destination
 
-- [ ] Verify the exact GitHub repository URL `https://github.com/seancorbitt10-png/Kitchen-Intelligence.git` and intended `main` branch
-- [ ] Push local handoff commit `b51d1a6` to the verified GitHub repository without changing product files
-- [ ] Verify the GitHub remote commit hash, expected documentation/source files, secret-free state, and clean local working tree
+- [x] Verify the exact GitHub repository URL `https://github.com/seancorbitt10-png/Kitchen-Intelligence.git` and intended `main` branch
+- [x] Push local handoff commit `b51d1a6` to the verified GitHub repository without changing product files
+- [x] Verify the GitHub remote commit hash, expected documentation/source files, secret-free state, and clean local working tree
