@@ -132,3 +132,9 @@
 - [ ] Verify required source, schema, migrations, configuration, tests, assets, and handoff documentation are represented in version control
 - [ ] Commit and push only legitimate secret-free changes if the remote is configured and push is authorized
 - [ ] Verify the remote branch, commit hash, file presence, clean working tree, and backup outcome
+
+# User-provided GitHub backup destination
+
+- [ ] Verify the exact GitHub repository URL `https://github.com/seancorbitt10-png/Kitchen-Intelligence.git` and intended `main` branch
+- [ ] Push local handoff commit `b51d1a6` to the verified GitHub repository without changing product files
+- [ ] Verify the GitHub remote commit hash, expected documentation/source files, secret-free state, and clean local working tree
