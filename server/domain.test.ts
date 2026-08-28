@@ -29,10 +29,12 @@ describe("kitchen domain utilities", () => {
     expect(scoreRecommendation({ pantryMatches: 4, ingredientCount: 4, missingIngredients: 0, expiresSoon: 1, preferenceFit: 1, allergyConflict: true })).toBe(-Infinity);
   });
 
-  it("enforces free limits while allowing paid plans through", () => {
-    expect(entitlementAllowed("free", 7, 8)).toBe(true);
-    expect(entitlementAllowed("free", 8, 8)).toBe(false);
-    expect(entitlementAllowed("plus", 999, 8)).toBe(true);
+  it("enforces finite limits for every plan", () => {
+    expect(entitlementAllowed("free", 0, 0)).toBe(false);
+    expect(entitlementAllowed("plus", 34, 35)).toBe(true);
+    expect(entitlementAllowed("plus", 35, 35)).toBe(false);
+    expect(entitlementAllowed("pro", 79, 80)).toBe(true);
+    expect(entitlementAllowed("pro", 80, 80)).toBe(false);
   });
 
   it("consolidates scaled missing ingredients", () => {

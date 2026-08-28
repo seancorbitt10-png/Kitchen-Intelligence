@@ -37,9 +37,9 @@ describe("Kitchen Intelligence router contracts", () => {
     await expect(appRouter.createCaller(context()).pantry.scan({ images: [], threshold: 0.65 })).rejects.toMatchObject({ code: "BAD_REQUEST" });
   });
 
-  it("fails closed for billing checkout and exposes the free fallback status", async () => {
+  it("fails closed for billing checkout and exposes the Plus trial status", async () => {
     const caller = appRouter.createCaller(context());
-    expect(await caller.billing.status()).toMatchObject({ plan: "free", status: "active" });
+    expect(await caller.billing.status()).toMatchObject({ plan: "plus", status: "active", trialActive: true, billingConfigured: false });
     await expect(caller.billing.startCheckout()).rejects.toMatchObject({ code: "PRECONDITION_FAILED" });
   });
 
