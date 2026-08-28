@@ -10,6 +10,22 @@ import "./index.css";
 
 const queryClient = new QueryClient();
 
+function initializeOptionalAnalytics() {
+  const endpoint = import.meta.env.VITE_ANALYTICS_ENDPOINT?.trim();
+  const websiteId = import.meta.env.VITE_ANALYTICS_WEBSITE_ID?.trim();
+  if (!endpoint || !websiteId || typeof document === "undefined") return;
+  if (document.querySelector('script[data-kitchen-analytics="umami"]')) return;
+
+  const script = document.createElement("script");
+  script.defer = true;
+  script.src = `${endpoint.replace(/\/$/, "")}/umami`;
+  script.dataset.websiteId = websiteId;
+  script.dataset.kitchenAnalytics = "umami";
+  document.head.appendChild(script);
+}
+
+initializeOptionalAnalytics();
+
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
   if (typeof window === "undefined") return;

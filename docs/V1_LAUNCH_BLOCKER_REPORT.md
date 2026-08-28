@@ -1,7 +1,7 @@
 # Kitchen Intelligence — Final V1 Completion and Launch-Blocker Report
 
-**Assessment date:** August 21, 2026  
-**Audit base:** checkpoint `6fd35180` plus the final shutdown cleanup and non-billing hardening pass  
+**Assessment date:** August 27, 2026
+**Audit base:** checkpoint `0f04e64` plus the current non-billing production-hardening pass
 **Scope:** Everything that can be completed without billing, payment processing, purchasing, or activating external services.
 
 ## 1. COMPLETED TODAY
@@ -87,12 +87,15 @@ Retailer/product discovery, durable image retention, richer acquisition attribut
 
 ## 7. FINAL STATUS
 
-| Measure | Assessment |
-|---|---:|
-| Non-billing engineering completion | **90%** |
-| Production readiness excluding billing | **78%** |
-| Private beta readiness | **82% after owner smoke test and provider verification** |
-| Paid beta readiness excluding billing integration | **68%** |
-| Public launch readiness excluding billing | **72%** |
+The current status is intentionally categorical rather than percentage-based, because several remaining gates depend on external credentials, managed services, production traffic, or legal approval that cannot be verified from this repository alone.
 
-The engineering work that is reasonably solvable inside the current environment is complete enough for release-candidate review, with the shutdown cleanup pass now complete at the codebase boundary. The project should **not** be represented as ready to sell subscriptions yet. It is ready for the next owner-controlled phase: configure the target environment, verify genuine AI/vision behavior with a clean account and real images, complete backup/restore and edge controls, approve legal copy, and then handle billing separately.
+| Area | Status | Evidence | Remaining action |
+|---|---|---|---|
+| Non-billing codebase | COMPLETE AT CODE BOUNDARY | TypeScript, tests, production build, security checks, structured validators, and core flows pass locally | None beyond normal maintenance |
+| Controlled free private beta | READY AFTER OWNER SMOKE TEST | Core product loop and user isolation are implemented and tested | Verify real OAuth, AI/vision, database persistence, and a clean-account journey |
+| Paid beta | BLOCKED | Billing remains intentionally fail-closed | Implement billing separately; do not change in this pass |
+| Public consumer launch | REQUIRES PRODUCTION CONFIGURATION AND OWNER APPROVAL | Domain, OAuth, provider, monitoring, backup, WAF, legal, and operational boundaries are documented | Complete the owner actions in Sections 3 and 6 |
+| Generated-image operations | CODE BOUNDARY HARDENED; PROVIDER PRICE UNVERIFIED | Timeout, payload validation, storage handoff, and optional cost hook are present | Verify ImageService pricing, quotas, retention, and ownership policy |
+| Cost instrumentation | PARTIALLY CONFIGURED | AI token usage and optional generated-image cost metadata are supported | Set verified rates and confirm image-token accounting with the active provider |
+
+The project should **not** be represented as fully production-ready or ready to sell subscriptions until the environment-dependent gates, legal review, production smoke test, backup/restore evidence, and billing work are complete. The repository is code-complete for the non-billing V1 scope to the extent that can be verified without the owner’s production accounts.

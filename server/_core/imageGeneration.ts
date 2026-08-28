@@ -15,6 +15,7 @@
  *     }]
  *   });
  */
+import { randomUUID } from "node:crypto";
 import { storagePut } from "server/storage";
 import { ENV } from "./env";
 
@@ -22,6 +23,7 @@ import { ENV } from "./env";
 // enum for GPT Image 2 (id: gpt-image-2). If omitted, forge falls back to Gemini 2.5 Flash.
 const DEFAULT_IMAGE_MODEL = "MODEL_GPT_IMAGE_2";
 const DEFAULT_IMAGE_QUALITY = "medium";
+const MAX_GENERATED_IMAGE_BYTES = 15 * 1024 * 1024;
 
 export type GenerateImageOptions = {
   prompt: string;
@@ -38,7 +40,27 @@ export type GenerateImageOptions = {
 
 export type GenerateImageResponse = {
   url?: string;
+  usage?: {
+    provider: "managed-image-service";
+    model: string;
+    quality?: string;
+    mimeType: string;
+    estimatedCost: string | null;
+  };
 };
+
+export function decodeGeneratedImagePayload(result: unknown) {
+  const image = (result as { image?: { b64Json?: unknown; mimeType?: unknown } } | null)?.image;
+  const base64Data = image?.b64Json;
+  const mimeType = image?.mimeType;
+  if (typeof base64Data !== "string" || !base64Data.trim() || typeof mimeType !== "string" || !mimeType.startsWith("image/")) {
+    throw new Error("Image generation returned an invalid image payload");
+  }
+  const buffer = Buffer.from(base64Data, "base64");
+  if (!buffer.length) throw new Error("Image generation returned an empty image");
+  if (buffer.length > MAX_GENERATED_IMAGE_BYTES) throw new Error("Image generation returned an oversized image");
+  return { buffer, mimeType };
+}
 
 export async function generateImage(
   options: GenerateImageOptions
@@ -64,6 +86,7 @@ export async function generateImage(
     options.quality ?? (model === DEFAULT_IMAGE_MODEL ? DEFAULT_IMAGE_QUALITY : undefined);
 
   const response = await fetch(fullUrl, {
+    signal: AbortSignal.timeout(30_000),
     method: "POST",
     headers: {
       accept: "application/json",
@@ -86,23 +109,23 @@ export async function generateImage(
     );
   }
 
-  const result = (await response.json()) as {
-    image: {
-      b64Json: string;
-      mimeType: string;
-    };
-  };
-  const base64Data = result.image.b64Json;
-  const buffer = Buffer.from(base64Data, "base64");
+  const { buffer, mimeType } = decodeGeneratedImagePayload(await response.json().catch(() => null));
 
-  // Save to S3
+  // Save to S3 with a non-guessable key to reduce accidental collisions and enumeration.
   const { url } = await storagePut(
-    `generated/${Date.now()}.png`,
+    `generated/${randomUUID()}.png`,
     buffer,
-    result.image.mimeType
+    mimeType
   );
   return {
     url,
+    usage: {
+      provider: "managed-image-service",
+      model,
+      quality,
+      mimeType,
+      estimatedCost: process.env.IMAGE_GENERATION_COST_PER_IMAGE?.trim() || null,
+    },
   };
 }
 

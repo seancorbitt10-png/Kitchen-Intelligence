@@ -19,6 +19,7 @@ The managed project injects the variables below. Secret values are intentionally
 | `VITE_ANALYTICS_WEBSITE_ID` | Built-in analytics site identifier | Platform-provided | Client analytics configuration | Verify before production use |
 | `AI_INPUT_COST_PER_1K_TOKENS` | Optional input rate used for estimated AI cost | No | `server/providers.ts` | Verify rate before cost-based commercial decisions |
 | `AI_OUTPUT_COST_PER_1K_TOKENS` | Optional output rate used for estimated AI cost | No | `server/providers.ts` | Verify rate before cost-based commercial decisions |
+| `IMAGE_GENERATION_COST_PER_IMAGE` | Optional verified provider rate recorded with generated-image metadata | No | `server/_core/imageGeneration.ts` | Set only after confirming the active model/quality price |
 
 The following categories are intentionally absent from the current non-billing build: payment processor credentials, retailer/product catalog credentials, external monitoring credentials, transactional-email credentials, durable image-retention credentials, and webhook signing secrets. Add them only after the owner selects a provider and approves the associated account, terms, and costs.
 
