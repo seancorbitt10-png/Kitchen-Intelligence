@@ -41,6 +41,7 @@ export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try { _db = drizzle(process.env.DATABASE_URL); } catch (error) { console.warn("[Database] Failed to connect:", error); }
   }
+  if (!_db && ENV.isProduction) throw new Error("DATABASE_URL is required for production persistence");
   return _db;
 }
 

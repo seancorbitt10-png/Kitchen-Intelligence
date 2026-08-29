@@ -39,8 +39,10 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "2mb", extended: true }));
   app.get("/healthz", (_req, res) => res.status(200).json({ ok: true, service: "kitchen-intelligence" }));
   app.get("/readyz", (_req, res) => {
-    const ready = Boolean(process.env.DATABASE_URL && process.env.BUILT_IN_FORGE_API_URL && process.env.BUILT_IN_FORGE_API_KEY);
-    res.status(ready ? 200 : 503).json({ ready, billingConfigured: false });
+    const required = ["DATABASE_URL", "JWT_SECRET", "VITE_APP_ID", "OAUTH_SERVER_URL", "VITE_OAUTH_PORTAL_URL", "BUILT_IN_FORGE_API_URL", "BUILT_IN_FORGE_API_KEY"];
+    const missing = required.filter(name => !process.env[name]);
+    const ready = missing.length === 0;
+    res.status(ready ? 200 : 503).json({ ready, missing, billingConfigured: false });
   });
   app.use("/api/oauth", apiRateLimit);
   app.use("/manus-storage", apiRateLimit);
